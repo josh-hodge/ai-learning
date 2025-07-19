@@ -1,47 +1,35 @@
-# Cat Chat 🐱
+# AI Learning Monorepo
 
-A purr-fectly fun chat application that demonstrates client-server communication using WebSocket, with a delightful cat theme!
+This repository is organized as a monorepo using npm workspaces. Each AI project lives in its own directory under `projects/`.
 
-## Features
-- Real-time messaging with cat-themed messages
-- Cute and playful UI with cat patterns
-- WebSocket-based communication
-- Multiple client support
-- Automatic "meow" additions to messages
-- Welcome message for new users
+## Projects
 
-## Prerequisites
-- Node.js (version 12 or higher)
-- npm (comes with Node.js)
+- **cat-chat**: The first AI project, containing the initial codebase.
 
-## Installation
-1. Clone this repository
-2. Install dependencies:
-   ```bash
+## Structure
+
+```
+ai-learning/
+  projects/
+    cat-chat/
+      package.json
+      package-lock.json
+      server.js
+      public/
+        index.html
+      README.md
+  README.md (this file)
+```
+
+## Getting Started
+
+1. Navigate to the project you want to work on, e.g. `projects/cat-chat`.
+2. Install dependencies from the root with:
+   ```sh
    npm install
    ```
+3. Run project-specific scripts from the project directory.
 
-## Running the Application
-1. Start the server:
-   ```bash
-   npm start
-   ```
-2. Open your browser and navigate to `http://localhost:3000`
-3. Open multiple browser windows to test the chat functionality
-4. Start sending meow-ssages to other users!
+---
 
-## How it Works
-- The server uses Express.js to serve static files and WebSocket for real-time communication
-- The client connects to the server using WebSocket
-- Messages are broadcasted to all connected clients with added "meow!"
-- The UI is built with vanilla HTML, CSS, and JavaScript
-- Features a playful cat-themed design with Comic Sans MS font
-
-## Learning Points
-- Setting up a Node.js server
-- WebSocket communication
-- Client-server architecture
-- Real-time data handling
-- Basic frontend development
-- CSS styling and animations
-- DOM manipulation
+Add new projects under `projects/` as needed.
