@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Chat</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-image: url('https://www.transparenttextures.com/patterns/cat-pattern.png');
+            background-color: #f0f8ff;
+        }
+        h1 {
+            color: #ff6b6b;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        #chat-container {
+            border: 3px solid #ff6b6b;
+            border-radius: 15px;
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #message-form {
+            display: flex;
+            gap: 10px;
+        }
+        #message-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            background-color: #ff5252;
+            transform: scale(1.05);
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            border-left: 4px solid;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s;
+        }
+        .message:hover {
+            transform: translateX(5px);
+        }
+        .cat-emoji {
+            font-size: 1.5em;
+        }
+        .message-content {
+            flex-grow: 1;
+        }
+        #user-cat {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 2em;
+            background-color: white;
+            padding: 10px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>🐱 Cat Chat 🐱</h1>
+    <div id="user-cat"></div>
+    <div id="chat-container"></div>
+    <form id="message-form">
+        <input type="text" id="message-input" placeholder="Type your meow-ssage..." required>
+        <button type="submit">Send Meow-ssage</button>
+    </form>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const userCat = document.getElementById('user-cat');
+        let userCatInfo = null;
+
+        // Function to create a lighter version of a color
+        function lightenColor(color) {
+            // Convert hex to RGB
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            
+            // Lighten the color by mixing with white (80% original, 20% white)
+            const lightenFactor = 0.5;
+            const newR = Math.round(r * lightenFactor + 255 * (1 - lightenFactor));
+            const newG = Math.round(g * lightenFactor + 255 * (1 - lightenFactor));
+            const newB = Math.round(b * lightenFactor + 255 * (1 - lightenFactor));
+            
+            // Convert back to hex
+            return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+        }
+
+        // Connect to WebSocket server
+        const ws = new WebSocket(`ws://${window.location.host}`);
+
+        // Handle WebSocket connection
+        ws.onopen = () => {
+            console.log('Connected to server');
+        };
+
+        // Handle incoming messages
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            
+            if (data.type === 'init') {
+                // Handle initial cat assignment
+                userCatInfo = {
+                    emoji: data.emoji,
+                    color: data.color
+                };
+                userCat.textContent = data.emoji;
+                userCat.style.borderColor = data.color;
+                
+                // Add welcome message
+                const welcomeMessage = document.createElement('div');
+                welcomeMessage.className = 'message';
+                welcomeMessage.style.borderLeftColor = data.color;
+                welcomeMessage.style.backgroundColor = lightenColor(data.color);
+                welcomeMessage.innerHTML = `
+                    <span class="cat-emoji">${data.emoji}</span>
+                    <span class="message-content">Welcome to Cat Chat! You are a ${data.emoji} cat! Meow!</span>
+                `;
+                chatContainer.appendChild(welcomeMessage);
+            } else if (data.type === 'message') {
+                // Handle chat message
+                const message = document.createElement('div');
+                message.className = 'message';
+                message.style.borderLeftColor = data.color;
+                message.style.backgroundColor = lightenColor(data.color);
+                message.innerHTML = `
+                    <span class="cat-emoji">${data.emoji}</span>
+                    <span class="message-content">${data.text} meow!</span>
+                `;
+                chatContainer.appendChild(message);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        };
+
+        // Handle form submission
+        messageForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = messageInput.value;
+            if (message.trim()) {
+                ws.send(message);
+                messageInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html> 
